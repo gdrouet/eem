@@ -1,21 +1,32 @@
 <html>
     <head>
-        <script src="vibe.min.js"></script>
+        <script src="webjars/atmosphere-javascript/2.2.3/atmosphere.js"></script>
         <script>
-            var socket = vibe.open("http://localhost:8080/vibe");
-            var open = function() {
-                console.log("on open event");
-            };
-            var chat = function(data) {
-                console.log("on chat event", data);
+            var subSocket;
+            // We are now ready to cut the request
+            var request = { url: document.location.toString() + 'websocket/' + (document.location.toString().indexOf('8080') !== -1 ? 'manager' : 'developer'),
+                contentType : "application/json",
+                logLevel : 'debug',
+                trackMessageLength : true,
+                reconnectInterval : 5000,
+                maxStreamingLength : 1000
             };
 
-            socket.on("open", open).on("chat", chat);
+            request.onOpen = function(response) {
+                console.log("connected");
+            };
+            request.onMessage = function (response) {
+
+                var message = response.responseBody;
+                console.log(message);
+            };
+
+            subSocket = atmosphere.subscribe(request);
         </script>
     </head>
 
     <body>
-        <button id="send" onclick="socket.send('echo', 'hello');">Send</button>
+        <button id="send" onclick="subSocket.push('foo');">Send</button>
     </body>
 
 </html>
