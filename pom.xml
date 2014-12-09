@@ -6,7 +6,11 @@
 	<groupId>com.github.gdrouet</groupId>
 	<artifactId>atmosphere-spring-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+        <module>developer</module>
+        <module>manager</module>
+    </modules>
+    <packaging>pom</packaging>
 
 	<name>Evil EM Demo </name>
 	<description>Evil Engagement Manager slaps nive Developers</description>
@@ -17,46 +21,6 @@
 		<version>1.2.0.RC1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-
-	<dependencies>
-        <!-- Atmosphere server -->
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-
-        <!-- Atmosphere browser -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>atmosphere-javascript</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-
-        <!-- Atmosphere java client -->
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>wasync</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-        <!-- Required for atmosphere -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-
-        <!-- Other starters -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

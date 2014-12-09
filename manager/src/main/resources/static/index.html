@@ -1,0 +1,94 @@
+<html ng-app="managerApp">
+    <head>
+        <script src="webjars/atmosphere-javascript/2.2.3/atmosphere.js"></script>
+        <script src="webjars/raphaeljs/2.1.2/raphael.js"></script>
+        <script src="webjars/angularjs/1.3.4-1/angular.js"></script>
+        <link rel="stylesheet" href="webjars/bootstrap/3.3.1/css/bootstrap.css">
+        <script src="justgage.js"></script>
+        <script>
+            var managerApp = angular.module('managerApp', []);
+
+            managerApp.controller('DevCtrl', function ($scope, $rootScope) {
+                $scope.developers = ["dev1", "dev2", "dev3"];
+                var subSocket;
+                // We are now ready to cut the request
+                var request = { url: document.location.toString() + 'websocket/manager',
+                    contentType : "application/json",
+                    logLevel : 'debug',
+                    trackMessageLength : true,
+                    reconnectInterval : 5000,
+                    maxStreamingLength : 1000
+                };
+
+                request.onOpen = function(response) {
+                    console.log("connected");
+                };
+
+                request.onMessage = function (response) {
+                    var working = "working:";
+                    var idx = response.responseBody.indexOf(working);
+
+                    if (idx != -1) {
+                        $rootScope.$broadcast(response.responseBody.substring(working.length));
+                    }
+                };
+
+                $scope.subsocket = atmosphere.subscribe(request);
+            }).directive('dev', function($timeout, $interval) {
+                return {
+                    template: '<div id="{{name}}" style="width:200px; height:160px;"></div>' +
+                            '<div style="text-align:center;width:100%;"><button type="button" class="btn btn-primary" ng-click="slap()">SLAP</button></div>',
+                    restrict: 'E',
+                    scope: {
+                        name: "=",
+                        subsocket: "="
+                    },
+                    controller: function($scope) {
+                        var stopInterval;
+                        var cancelRegistration;
+
+                        $scope.start = function(gage) {
+                            var val = 0;
+                            stopInterval = $interval(function() {
+                                gage.refresh(++val);
+                            }, 100, 100);
+
+                            if (cancelRegistration) {
+                                cancelRegistration();
+                            }
+
+                            cancelRegistration = $scope.$on($scope.name, function() {
+                                if (stopInterval) {
+                                    $interval.cancel(stopInterval);
+                                    $scope.start(gage);
+                                }
+                            });
+                        };
+
+
+                        $scope.slap = function() {
+                            $scope.subsocket.push("slap:" + $scope.name);
+                        };
+                    },
+                    link: function(scope) {
+                        $timeout(function() {
+                            scope.start(new JustGage({
+                                id: scope.name,
+                                value: 0,
+                                title: "Dev '" + scope.name + "' inactivity",
+                                label: "Tenths"
+                            }));
+                        }, 200);
+                    }
+                };
+            });
+        </script>
+
+    </head>
+
+    <body ng-controller="DevCtrl">
+        <div class="pull-left" ng-repeat="d in developers">
+            <dev name="d" subsocket="subsocket"></dev>
+        </div>
+    </body>
+</html>
